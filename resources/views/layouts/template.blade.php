@@ -28,9 +28,9 @@
 @include('layouts.sidebar')
 </aside>
 
-<div class"content-wrapper">
+<div class="content-wrapper">
     @include('layouts.breadcrumb')
-    <section>
+    <section class="content">
         @yield('content')
 
     </section>
