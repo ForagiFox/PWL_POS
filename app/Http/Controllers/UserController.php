@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
+use function Laravel\Prompts\select;
 class UserController extends Controller
 {
 
@@ -64,27 +65,75 @@ class UserController extends Controller
     }
     public function list(Request $request)
     {
-        $users = UserModel::select('user_id','username','nama','level_id')
-            ->with('level');
+    $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
+        ->with('level');
 
-        if ($request->level_id) {
-            $users->where('level_id',$request->level_id);
+    // Filter data user berdasarkan level_id
+    if ($request->level_id) {
+        $users->where('level_id', $request->level_id);
+    }
+
+    return DataTables::of($users)
+        ->addIndexColumn() // Menambahkan kolom index / nomor urut
+        ->addColumn('aksi', function ($user) {
+            $btn  = '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+            $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+            $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
+            return $btn;
+        })
+        ->rawColumns(['aksi']) // Memberitahu bahwa kolom aksi mengandung HTML
+        ->make(true);
+    }
+
+    public function edit_ajax(string $id)
+    {
+        $user = UserModel::find($id);
+        $level = LevelModel::select('level_id','level_nama')->get();
+
+        return view('user.edit_ajax',['user' => $user, 'level' => $level]);
+    }
+
+public function update_ajax(Request $request, $id)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+        $rules = [
+            'username'  => 'required|string|min:3|unique:m_user,username,' . $id . ',user_id',
+            'nama'      => 'required|string|max:100',
+            'password'  => 'nullable|min:5',
+            'level_id'  => 'required|integer',
+        ];
+
+        // Validasi input
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    => false,
+                'message'   => 'Validasi gagal.',
+                'msgField'  => $validator->errors()
+            ]);
         }
 
-       return DataTables::of($users)
-            ->addIndexColumn()
-            ->addColumn('aksi', function ($user) {
-                $btn = '<a href="' . url('/user/' . $user->user_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="' . url('/user/' . $user->user_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="' . url('/user/' . $user->user_id) . '" style="display:inline;">'
-                    . csrf_field() . method_field('DELETE') .
-                    '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button>
-                </form>';
-                return $btn;
-            })
-            ->rawColumns(['aksi'])
-            ->make(true);    }
+        $user = UserModel::find($id);
+        if (!$user) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
 
+        // Jika password tidak diisi, hapus dari request
+        if (!$request->filled('password')) {
+            $request->request->remove('password');
+        }
+
+        $user->update($request->all());
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Data berhasil diupdate'
+        ]);
+    }
+}
     public function create(){
         $breadcrumb = (object) [
             'title' => 'Tambah User',
