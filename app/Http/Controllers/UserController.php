@@ -31,40 +31,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function store_ajax(Request $reqeust)
-    {
-        if ($reqeust->ajax() || $reqeust->wantsJson()) {
-            $rules = [
-                "username" => "required|string|min:3|unique:m_user,username",
-                "nama" => "required|string|max:100",
-                "password" => "required|min:6",
-                "level_id" => "required|integer",
-            ];
-
-            $validator = Validator::make($reqeust->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Validasi Gagal",
-                    "msgField" => $validator->errors(),
-                ]);
-            }
-
-            UserModel::create($reqeust->all());
-            return response()->json([
-                "status" => true,
-                "message" => "Data user berhasil disimpan",
-            ]);
-        }
-    }
-
-    public function create_ajax()
-    {
-        $level = LevelModel::select("level_id", "level_nama")->get();
-
-        return view("user.create_ajax")->with("level", $level);
-    }
     public function list(Request $request)
     {
         $users = UserModel::select(
@@ -100,7 +66,41 @@ class UserController extends Controller
             ->make(true);
     }
 
-    public function edit_ajax(string $id)
+     public function store_ajax(Request $reqeust)
+    {
+        if ($reqeust->ajax() || $reqeust->wantsJson()) {
+            $rules = [
+                "username" => "required|string|min:3|unique:m_user,username",
+                "nama" => "required|string|max:100",
+                "password" => "required|min:6",
+                "level_id" => "required|integer",
+            ];
+
+            $validator = Validator::make($reqeust->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Validasi Gagal",
+                    "msgField" => $validator->errors(),
+                ]);
+            }
+
+            UserModel::create($reqeust->all());
+            return response()->json([
+                "status" => true,
+                "message" => "Data user berhasil disimpan",
+            ]);
+        }
+    }
+
+    public function create_ajax()
+    {
+        $level = LevelModel::select("level_id", "level_nama")->get();
+
+        return view("user.create_ajax")->with("level", $level);
+    }
+   public function edit_ajax(string $id)
     {
         $user = UserModel::find($id);
         $level = LevelModel::select("level_id", "level_nama")->get();
@@ -150,6 +150,36 @@ class UserController extends Controller
         }
         return redirect("/");
     }
+
+    public function confirm_ajax(string $id) {
+        $user = UserModel::find($id);
+
+        return view('user.confirm_ajax', ['user'=>$user]);
+
+    }
+
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+
+            $user = UserModel::find($id);
+            if ($user) {
+                $user->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Berhasil dihapus'
+                ]);
+            }else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+
+    }
+
     public function create()
     {
         $breadcrumb = (object) [
@@ -291,34 +321,6 @@ class UserController extends Controller
         }
     }
 
-    public function confirm_ajax(string $id) {
-        $user = UserModel::find($id);
-
-        return view('user.confirm_ajax', ['user'=>$user]);
-
-    }
-
-    public function delete_ajax(Request $request, $id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-
-            $user = UserModel::find($id);
-            if ($user) {
-                $user->delete();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data Berhasil dihapus'
-                ]);
-            }else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-        }
-        return redirect('/');
-
-    }
 
 }
 

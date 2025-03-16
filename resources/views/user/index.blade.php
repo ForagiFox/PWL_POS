@@ -6,7 +6,7 @@
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
                 <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
-                <button onclick="modalAction('{{ url('user/create_ajax')}}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                <button onclick="modalAction('{{ url('/user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
 
             </div>
         </div>
@@ -24,7 +24,7 @@
                         <div class="col-3">
                             <select class="form-control" id="level_id" name="level_id" required>
                                 <option value="">Semua</option>
-                                @foreach($level as $item)
+                                @foreach ($level as $item)
                                     <option value="{{ $item->level_id }}">{{ $item->level_nama }}</option>
                                 @endforeach
                             </select>
@@ -35,21 +35,19 @@
             </div>
             <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
                 <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Nama</th>
-                    <th>Level Pengguna</th>
-                    <th>Aksi</th>
-                </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Nama</th>
+                        <th>Level Pengguna</th>
+                        <th>Aksi</th>
+                    </tr>
                 </thead>
             </table>
         </div>
     </div>
 
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
-
-
 @endsection
 
 @push('css')
@@ -57,34 +55,58 @@
 
 @push('js')
     <script>
-    function modalAction(url = ''){
-$('#myModal').load(url,function(){
-$('#myModal').modal('show');
-});
-}
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
 
         var dataUser;
-        $(document).ready(function () {
+        $(document).ready(function() {
             dataUser = $('#table_user').DataTable({
                 serverSide: true,
                 ajax: {
                     url: "{{ url('user/list') }}",
                     dataType: "json",
                     type: "POST",
-                    data: function (d) {
+                    data: function(d) {
                         d.level_id = $('#level_id').val();
                     }
                 },
-                columns: [
-                    {data: "DT_RowIndex", className: "text-center", orderable: false, searchable: false},
-                    {data: "username", className: "", orderable: true, searchable: true},
-                    {data: "nama", className: "", orderable: true, searchable: true},
-                    {data: "level.level_nama", className: "", orderable: false, searchable: false},
-                    {data: "aksi", className: "", orderable: false, searchable: false}
+                columns: [{
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "username",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "level.level_nama",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "aksi",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
 
-            $('#level_id').on('change', function () {
+            $('#level_id').on('change', function() {
                 dataUser.ajax.reload();
             });
         });
