@@ -77,15 +77,15 @@ Route::group(['prefix' => 'supplier'], function (){
     Route::post('/list',[SupplierController::class, 'list']);
     Route::get('/create',[SupplierController::class, 'create']);
     Route::post('/',[SupplierController::class, 'store']);
+    Route::get('/create_ajax',[SupplierController::class, 'create_ajax']);
     Route::get('/{id}',[SupplierController::class, 'show']);
     Route::get('/{id}/edit',[SupplierController::class, 'edit']);
     Route::put('/{id}',[SupplierController::class, 'update']);
-    Route::post('/ajax',[UserController::class, 'store_ajax']);
-    Route::get('/create_ajax',[UserController::class, 'create_ajax']);
-    Route::get('/{id}/edit_ajax',[UserController::class, 'edit_ajax']);
-    Route::put('/{id}/update_ajax',[UserController::class, 'update_ajax']);
-    Route::get('/{id}/delete_ajax',[UserController::class, 'confirm_ajax']);
-    Route::delete('/{id}/delete_ajax',[UserController::class, 'delete_ajax']);
+    Route::post('/ajax',[SupplierController::class, 'store_ajax']);
+    Route::get('/{id}/edit_ajax',[SupplierController::class, 'edit_ajax']);
+    Route::put('/{id}/update_ajax',[SupplierController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax',[SupplierController::class, 'confirm_ajax']);
+    Route::delete('/{id}/delete_ajax',[SupplierController::class, 'delete_ajax']);
     Route::delete('/{id}',[SupplierController::class, 'destroy']);
 });
 
