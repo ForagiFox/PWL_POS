@@ -60,15 +60,15 @@ Route::group(['prefix' => 'kategori'], function (){
     Route::post('/list',[CategoryController::class, 'list']);
     Route::get('/create',[CategoryController::class, 'create']);
     Route::post('/',[CategoryController::class, 'store']);
+    Route::get('/create_ajax',[CategoryController::class, 'create_ajax']);
     Route::get('/{id}',[CategoryController::class, 'show']);
     Route::get('/{id}/edit',[CategoryController::class, 'edit']);
     Route::put('/{id}',[CategoryController::class, 'update']);
-    Route::post('/ajax',[UserController::class, 'store_ajax']);
-    Route::get('/create_ajax',[UserController::class, 'create_ajax']);
-    Route::get('/{id}/edit_ajax',[UserController::class, 'edit_ajax']);
-    Route::put('/{id}/update_ajax',[UserController::class, 'update_ajax']);
-    Route::get('/{id}/delete_ajax',[UserController::class, 'confirm_ajax']);
-    Route::delete('/{id}/delete_ajax',[UserController::class, 'delete_ajax']);
+    Route::post('/ajax',[CategoryController::class, 'store_ajax']);
+    Route::get('/{id}/edit_ajax',[CategoryController::class, 'edit_ajax']);
+    Route::put('/{id}/update_ajax',[CategoryController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax',[CategoryController::class, 'confirm_ajax']);
+    Route::delete('/{id}/delete_ajax',[CategoryController::class, 'delete_ajax']);
     Route::delete('/{id}',[CategoryController::class, 'destroy']);
 });
 
