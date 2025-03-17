@@ -228,11 +228,19 @@ class LevelController extends Controller
 
             $user = LevelModel::find($id);
             if ($user) {
+                 try{
                 $user->delete();
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Berhasil dihapus'
-                ]);
+                    ]);
+
+                }catch(\Illuminate\Database\QueryException $e){
+                    return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi Kesalahan'
+                    ]);
+                }
             }else {
                 return response()->json([
                     'status' => false,

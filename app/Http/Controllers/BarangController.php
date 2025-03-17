@@ -255,7 +255,7 @@ class BarangController extends Controller
     }
 
     public function confirm_ajax(string $id){
-        $barang = barangModel::find($id);
+        $barang = BarangModel::find($id);
 
         return view('barang.confirm_ajax', ['barang' => $barang]);
     }
@@ -263,13 +263,21 @@ class BarangController extends Controller
     public function delete_ajax(Request $request, $id){
         // cek apakah request dari ajax
         if ($request->ajax() || $request->wantsJson()) {
-            $barang = barangModel::find($id);
+            $barang = BarangModel::find($id);
             if ($barang) {
+                 try{
                 $barang->delete();
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil dihapus'
-                ]);
+                    'message' => 'Data Berhasil dihapus'
+                    ]);
+
+                }catch(\Illuminate\Database\QueryException $e){
+                    return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi Kesalahan'
+                    ]);
+                }
             } else {
                 return response()->json([
                     'status' => false,

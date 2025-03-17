@@ -232,11 +232,19 @@ class SupplierController extends Controller
 
             $user = SupplierModel::find($id);
             if ($user) {
+                 try{
                 $user->delete();
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Berhasil dihapus'
-                ]);
+                    ]);
+
+                }catch(\Illuminate\Database\QueryException $e){
+                    return response()->json([
+                    'status' => false,
+                    'message' => 'Terjadi Kesalahan'
+                    ]);
+                }
             }else {
                 return response()->json([
                     'status' => false,
