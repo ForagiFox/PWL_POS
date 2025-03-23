@@ -23,21 +23,30 @@ ack">
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
-            <div class="card-header text-center"><a href="{{ url('/') }}"
-                   class="h1"><b>Admin</b>LTE</a></div>
+            <div class="card-header text-center">
+                <a href="{{ url('/') }}" class="h1"><b>Admin</b>LTE</a>
+            </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
-                <form action="{{ url('login') }}" method="POST" id="form-login">
+                <p class="login-box-msg">Sign up your account</p>
+                <form action="{{ url('register') }}" method="POST" id="form-login">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="text" id="username" name="username" class="form-control"
-                               placeholder="Username">
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Username">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
                         <small id="error-username" class="error-text text-danger"></small>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Name">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                        <small id="error-name" class="error-text text-danger"></small>
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" id="password" name="password" class="form-control"
@@ -49,20 +58,20 @@ ack">
                         </div>
                         <small id="error-password" class="error-text text-danger"></small>
                     </div>
-                    <div class="row mb-2">
+                    <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="remember"><label for="remember">Remember Me</label>
                             </div>
                         </div>
                         <!-- /.col -->
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        <div class="col-4 mb-3">
+                            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                        </div>
+                        <div class="row">
+                            <a class="col-9" href="{{ url('/login') }}">Sign in here if already have account</a>
                         </div>
                         <!-- /.col -->
-                    </div>
-                    <div class="row">
-                        <a class="col-8" href="{{ url('/register') }}">Sign Up in here</a>
                     </div>
                 </form>
             </div>
@@ -96,6 +105,11 @@ ack">
                         required: true,
                         minlength: 4,
                         maxlength: 20
+                    },
+                    name: {
+                        required: true,
+                        minlength: 4,
+                        maxlength: 100
                     },
                     password: {
                         required: true,
