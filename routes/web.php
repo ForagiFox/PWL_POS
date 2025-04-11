@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function(){
             Route::post('/ajax',[UserController::class, 'store_ajax']);
             Route::get('/create_ajax',[UserController::class, 'create_ajax']);
             Route::post('/',[BarangController::class, 'store']);
+            Route::get('/export_excel',[BarangController::class, 'export_excel']);
             Route::get('/import',[BarangController::class, 'import']);
             Route::post('/import_ajax',[BarangController::class, 'import_ajax']);
             Route::get('/{id}',[BarangController::class, 'show']);
