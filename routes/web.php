@@ -29,7 +29,6 @@ Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/', [WelcomeController::class,'index']);
-
     Route::middleware(['authorize:ADM,MNG'])->group(function(){
 
         Route::group(['prefix' => 'barang'], function (){
@@ -123,6 +122,16 @@ Route::middleware(['auth'])->group(function(){
             Route::delete('/{id}',[SupplierController::class, 'destroy']);
         });
     });
+    Route::middleware(['authorize:ADM,MNG,STF'])->group(function(){
+        Route::group(['prefix' => 'profile'], function(){
+            Route::get('/{id}/edit',[UserController::class, 'edit_ajax']);
+        });
+        Route::group(['prefix' => 'user'], function (){
+            Route::put('/{id}/update_ajax',[UserController::class, 'update_ajax']);
+        });
+    });
+
+
 });
 
 

@@ -17,7 +17,7 @@
         </div>
     </div>
 @else
-    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit"  enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
@@ -30,6 +30,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                                    <div class="form-group">
+                    <label>Foto Pengguna (Optional)</label>
+                    <input type="file" name="photo" id="photo" class="form-control">
+                    <small id="error-file_barang" class="error-text form-text text-danger"></small>
+                </div>
+
+                    @if(auth()->user()->level->level_kode == 'ADM' || auth()->user()->level->level_kode == 'MNG')
+
                         <label>Level Pengguna</label>
                         <select name="level_id" id="level_id" class="form-control" required>
                             <option value="">- Pilih Level -</option>
@@ -41,7 +49,7 @@
                         </select>
                         <small id="error-level_id" class="error-text form-text text-danger"></small>
                     </div>
-
+                    @endif
                     <div class="form-group">
                         <label>Username</label>
                         <input type="text" name="username" id="username" class="form-control" value="{{ $user->username }}" required>
@@ -74,8 +82,12 @@
         $(document).ready(function() {
             $("#form-edit").validate({
                 rules: {
+                    photo: {
+                        required: false,
+                        extension: "jpg,png,jpeg"
+                    },
                     level_id: {
-                        required: true,
+                        required: false,
                         number: true
                     },
                     username: {
@@ -94,10 +106,13 @@
                     }
                 },
                 submitHandler: function(form) {
+                    var formData = new FormData(form); // Buat FormData dari form
                     $.ajax({
                         url: form.action,
                         type: form.method,
-                        data: $(form).serialize(),
+                        data: formData,
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             if (response.status) {
                                 $('#modal-master').modal('hide');

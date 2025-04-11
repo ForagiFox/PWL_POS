@@ -101,55 +101,79 @@ class UserController extends Controller
         return view("user.create_ajax")->with("level", $level);
     }
    public function edit_ajax(string $id)
-    {
+    {    // Jika bukan admin, hanya boleh mengedit dirinya sendiri
+    $user = auth()->user();
+
+    // Jika bukan ADM/MNG dan bukan diri sendiri
+    if (!in_array($user->level->level_kode, ['ADM', 'MNG']) && $user->user_id != $id) {
+        abort(403); // Forbidden
+    }else{
         $user = UserModel::find($id);
         $level = LevelModel::select("level_id", "level_nama")->get();
 
-        return view("user.edit_ajax", ["user" => $user, "level" => $level]);
+            return view("user.edit_ajax", ["user" => $user, "level" => $level]);
+    }
     }
 
-    public function update_ajax(Request $request, $id)
-    {
-        // cek apakah request dari ajax
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                "level_id" => "required|integer",
-                "username" =>
-                    "required|max:20|unique:m_user,username," .
-                    $id .
-                    ",user_id",
-                "nama" => "required|max:100",
-                "password" => "nullable|min:6|max:20",
-            ];
-            // use Illuminate\Support\Facades\Validator;
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => false, // respon json, true: berhasil, false: gagal
-                    "message" => "Validasi gagal.",
-                    "msgField" => $validator->errors(), // menunjukkan field mana yang error
-                ]);
-            }
-            $check = UserModel::find($id);
-            if ($check) {
-                if (!$request->filled("password")) {
-                    // jika password tidak diisi, maka hapus dari
-                    $request->request->remove("password");
-                }
-                $check->update($request->all());
-                return response()->json([
-                    "status" => true,
-                    "message" => "Data berhasil diupdate",
-                ]);
-            } else {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Data tidak ditemukan",
-                ]);
-            }
+public function update_ajax(Request $request, $id)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+
+        $rules = [
+            "level_id" => "nullable|integer",
+            "username" => "required|max:20|unique:m_user,username," . $id . ",user_id",
+            "nama" => "required|max:100",
+            "password" => "nullable|min:6|max:20",
+            "photo"    => "nullable|mimes:jpg,jpeg,png|max:2048"
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                "status"   => false,
+                "message"  => "Validasi gagal.",
+                "msgField" => $validator->errors(),
+            ]);
         }
-        return redirect("/");
+
+        $check = UserModel::find($id);
+        if ($check) {
+            // Ambil data kecuali field photo (karena akan kita proses terpisah)
+            $data = $request->except("photo");
+
+            // Proses upload file foto jika ada
+            if ($request->hasFile("photo")) {
+                $foto    = $request->file("photo");
+                $namaFoto = time() . '_' . uniqid() . '.' . $foto->getClientOriginalExtension();
+                $foto->move(public_path('uploads/foto_user'), $namaFoto);
+
+                // Hapus foto lama jika ada
+                if ($check->photo && file_exists(public_path('uploads/foto_user/' . $check->photo))) {
+                    unlink(public_path('uploads/foto_user/' . $check->photo));
+                }
+
+                $data["photo"] = $namaFoto;
+            }
+
+            // Jika password tidak diisi maka hapus dari data update agar tidak diupdate sebagai string kosong
+            if (!$request->filled("password")) {
+                unset($data["password"]);
+            }
+
+            $check->update($data);
+            return response()->json([
+                "status"  => true,
+                "message" => "Data berhasil diupdate",
+            ]);
+        } else {
+            return response()->json([
+                "status"  => false,
+                "message" => "Data tidak ditemukan",
+            ]);
+        }
     }
+    return redirect("/");
+}
 
     public function confirm_ajax(string $id) {
         $user = UserModel::find($id);
