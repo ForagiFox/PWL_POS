@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LevelController extends Controller
 {
@@ -251,6 +253,137 @@ class LevelController extends Controller
         return redirect('/');
 
     }
+    public function import()
+    {
+        return view("level.import");
+    }
 
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // validasi file harus xls atau xlsx, max 1MB
+                "file_barang" => ["required", "mimes:xlsx", "max:1024"],
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Validasi Gagal",
+                    "msgField" => $validator->errors(),
+                ]);
+            }
+            $file = $request->file("file_supplier"); // ambil file dari request
+            $reader = IOFactory::createReader("Xlsx"); // load reader file excel
+            $reader->setReadDataOnly(true); // hanya membaca data
+            try {
+                $spreadsheet = $reader->load($file->getRealPath());
+            } catch (\Exception $e) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "File Excel tidak valid atau rusak: " . $e->getMessage(),
+                ]);
+            }
+            $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // ambil data excel
+            $insert = [];
+            if (count($data) > 1) {
+                // jika data lebih dari 1 baris
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) {
+                        // baris ke 1 adalah header, maka lewati
+                        $insert[] = [
+                            "level_kode" => $value["A"],
+                            "level_nama" => $value["B"],
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // insert data ke database, jika data sudah ada, maka diabaikan
+                    LevelModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    "status" => true,
+                    "message" => "Data berhasil diimport",
+                ]);
+            } else {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Tidak ada data yang diimport",
+                ]);
+            }
+        }
+        return redirect("/");
+    }
+
+        public function export_excel()
+    {
+        // Ambil data barang yang akan diexport
+        $barang = LevelModel::select('level_id', 'level_kode', 'level_nama')
+            ->orderBy('level_id')
+            ->get();
+
+        // Buat objek Spreadsheet baru
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Level');
+        $sheet->setCellValue('C1', 'Nama Level');
+
+        // Buat header bold
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+
+        // Isi data
+        $no = 1;
+        $baris = 2;
+        foreach ($barang as $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->level_kode);
+            $sheet->setCellValue('C' . $baris, $value->level_nama);
+            $baris++;
+            $no++;
+        }
+
+        // Set auto size untuk kolom
+        foreach (range('A', 'F') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Set title sheet
+        $sheet->setTitle('Data Supploer');
+
+        // Buat writer untuk file Excel
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Supplier ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        // Set header HTTP untuk file download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        // Tampilkan file Excel untuk diunduh
+        $writer->save('php://output');
+        exit;
+    }
+    public function export_pdf()
+    {
+        $barang = LevelModel::select('level_id', 'level_kode', 'level_nama')
+            ->orderBy('level_id')
+            ->get();
+
+
+        $pdf = Pdf::loadView('level.export_pdf', ['barang' => $barang]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+
+        return $pdf->stream('Data Barang ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 
 }
