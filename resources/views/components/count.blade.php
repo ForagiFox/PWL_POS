@@ -11,7 +11,7 @@
         <path id="{{ $id }}" d=""/>
     </svg>
 
-    <div class="p-2 position-relative">
+    <div class="p-3 position-relative">
         <h3 class="text-white text-bold">{{ $title }}</h3>
         <h4 class="text-white mb-4">{{ $value }}</h4>
     </div>
