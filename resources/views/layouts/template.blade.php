@@ -69,7 +69,9 @@
   <script src="{{asset('adminlte/plugins/jquery-validation/jquery.validate.min.js')}}"></script>
   <script src="{{asset('adminlte/plugins/jquery-validation/additional-methods.min.js')}}"></script>
   <script src="{{asset('adminlte/plugins/sweetalert2/sweetalert2.min.js')}}"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="{{asset('jquery.wavify.js')}}"></script>
+  <script src="{{asset('wavify.js')}}"></script>
   <script>
       $.ajaxSetup({headers:{'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')}});
   </script>

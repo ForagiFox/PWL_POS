@@ -4,24 +4,19 @@
 
 
         <div class="image">
-          <img src="{{ asset('uploads/foto_user/' . Auth::user()->photo) }}" class="img-circle elevation-2" alt="User Image">
+<img src="{{ asset('uploads/foto_user/' . Auth::user()->photo) }}"
+     class="rounded-circle"
+     style="width: 50px; height: 50px; object-fit: cover;"
+     alt="User Image">
         </div>
         <div class="info">
           <a href='#' onclick="modalAction('{{ url('profile/'.auth()->user()->user_id.'/edit/' ) }}')" class="d-block">{{ auth()->user()->nama }}</a>
+          <p class="text-white">{{ Auth::user()->level->level_nama}}</p>
         </div>
       </div>
 
       <!-- SidebarSearch Form -->
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+
 
 <nav class="mt-2">
 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview"
@@ -79,7 +74,7 @@ role="menu" data-accordion="false">
 </a>
 </li>
 <li class="nav-item">
-<a href="{{ url('/barang') }}" class="nav-link {{ ($activeMenu ==
+<a href="{{ url('/penjualan') }}" class="nav-link {{ ($activeMenu ==
 'penjualan')? 'active' : '' }} ">
 <i class="nav-icon fas fa-cash-register"></i>
 <p>Transaksi Penjualan</p>

@@ -269,7 +269,7 @@ class SupplierController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 // validasi file harus xls atau xlsx, max 1MB
-                "file_barang" => ["required", "mimes:xlsx", "max:1024"],
+                "file_supplier" => ["required", "mimes:xlsx", "max:1024"],
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -300,8 +300,8 @@ class SupplierController extends Controller
                         // baris ke 1 adalah header, maka lewati
                         $insert[] = [
                             "supplier_kode" => $value["A"],
-                            "supplier_name" => $value["B"],
-                            "supllier_alamat" => $value["C"],
+                            "supplier_nama" => $value["B"],
+                            "supplier_alamat" => $value["C"],
                             "created_at" => now(),
                         ];
                     }

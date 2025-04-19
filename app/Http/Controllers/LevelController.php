@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\LevelModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -352,11 +351,11 @@ class LevelController extends Controller
         }
 
         // Set title sheet
-        $sheet->setTitle('Data Supploer');
+        $sheet->setTitle('Data Level');
 
         // Buat writer untuk file Excel
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data Supplier ' . date('Y-m-d H:i:s') . '.xlsx';
+        $filename = 'Data Level ' . date('Y-m-d H:i:s') . '.xlsx';
 
         // Set header HTTP untuk file download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -4,31 +4,30 @@
     @auth
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Halo {{ auth()->user()->username }}, apakabar!!!</h3>
+                <h3 class="card-title">Halo {{ auth()->user()->nama }}, apakabar?!!</h3>
                 <div class="card-tools">
                     <a href="{{ url('logout') }}" class="btn btn-sm btn-danger mt-1">Logout</a>
                 </div>
             </div>
             <div class="card-body">
-                Selamat datang semua, ini adalah halaman utama dari aplikasi ini.
+<div class="row g-4">
+    <div class="col-12 col-md-6">
+        <x-count
+            title="Total Penjualan"
+            :value="$penjualan"
+        />
+    </div>
+    <div class="col-12 col-md-6">
+        <x-count
+            title="Total Stok"
+            :value="$stok"
+            bg="bg-success"
+        />
+    </div>
+</div>
             </div>
         </div>
     @endauth
-    @guest
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Halo, apakabar!!!</h3>
-                <div class="card-tools">
-                    <a href="{{ url('login') }}" class="btn btn-sm btn-success mt-1">Login</a>
-                </div>
-            </div>
-            <div class="card-body">
-                Selamat datang semua, ini adalah halaman utama dari aplikasi ini.
-            </div>
-        </div>
-
-    @endguest
-
     <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 @push('css')

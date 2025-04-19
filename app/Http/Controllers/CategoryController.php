@@ -353,11 +353,11 @@ class CategoryController extends Controller
         }
 
         // Set title sheet
-        $sheet->setTitle('Data Supploer');
+        $sheet->setTitle('Data Kategori');
 
         // Buat writer untuk file Excel
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data Supplier ' . date('Y-m-d H:i:s') . '.xlsx';
+        $filename = 'Data Kategori ' . date('Y-m-d H:i:s') . '.xlsx';
 
         // Set header HTTP untuk file download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

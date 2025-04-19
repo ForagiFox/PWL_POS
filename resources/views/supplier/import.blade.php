@@ -1,4 +1,4 @@
-<form action="{{ url('/user/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
+<form action="{{ url('/supplier/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
     @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -17,7 +17,7 @@
                 </div>
                 <div class="form-group">
                     <label>Pilih File</label>
-                    <input type="file" name="file_user" id="file_user" class="form-control" required>
+                    <input type="file" name="file_supplier" id="file_supplier" class="form-control" required>
                     <small id="error-file_barang" class="error-text form-text text-danger"></small>
                 </div>
             </div>
@@ -34,7 +34,7 @@
     $(function () {
         $("#form-import").validate({
             rules: {
-                file_user: {
+                file_supplier: {
                     required: true,
                     extension: "xlsx"
                 }

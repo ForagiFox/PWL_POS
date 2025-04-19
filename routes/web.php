@@ -4,9 +4,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
+use Database\Seeders\PenjualanDetailSeeder;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -137,6 +140,21 @@ Route::middleware(['auth'])->group(function(){
             Route::delete('/{id}/delete_ajax',[SupplierController::class, 'delete_ajax']);
             Route::delete('/{id}',[SupplierController::class, 'destroy']);
         });
+        Route::group(['prefix' => 'penjualan'], function (){
+            Route::get('/',[PenjualanController::class, 'index']);
+            Route::post('/list',[PenjualanController::class, 'list']);
+            Route::get('/{id}/detail',[PenjualanController::class, 'detail']);
+        });
+        Route::group(['prefix' => 'stok'], function (){
+            Route::get('/',[StokController::class, 'index']);
+            Route::post('/list',[StokController::class, 'list']);
+            Route::get('/{id}/detail',[StokController::class, 'detail']);
+            Route::get('/{id}/confirm',[StokController::class, 'confirm']);
+            Route::delete('/{id}/delete',[StokController::class, 'delete']);
+            Route::get('/create',[StokController::class, 'create']);
+            Route::post('/store',[StokController::class, 'store']);
+
+        });
     });
     Route::middleware(['authorize:ADM,MNG,STF'])->group(function(){
         Route::group(['prefix' => 'profile'], function(){
@@ -147,6 +165,22 @@ Route::middleware(['auth'])->group(function(){
         });
     });
 
+    Route::get('/test/count', function () {
+        $activeMenu = 'dashboard';
+        $breadcrumb = (object) [
+            'title' => 'Ruang Test',
+            'list' => ['Home','Test']
+        ];
+
+        $page = (object)[
+            'title' => 'Ini adalah ruang test'
+        ];
+        return view('components.count', [
+            'breadcrumb' => $breadcrumb,
+            'title' => 'Ruang Test',
+            'activeMenu' => $activeMenu,
+        ]);
+    });
 
 });
 
