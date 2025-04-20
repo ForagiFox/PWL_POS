@@ -3,22 +3,22 @@
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Import Data User</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Import Data Supplier</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
-                    <a href="{{ asset('template_barang.xlsx') }}" class="btn btn-info btn-sm" download>
+                    <a href="{{ asset('template_supplier.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download
                     </a>
                     <small id="error-kategori_id" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Pilih File</label>
-                    <input type="file" name="file_supplier" id="file_supplier" class="form-control" required>
-                    <small id="error-file_barang" class="error-text form-text text-danger"></small>
+                    <input type="file" name="file" id="file" class="form-control" required>
+                    <small id="error-file" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -34,7 +34,7 @@
     $(function () {
         $("#form-import").validate({
             rules: {
-                file_supplier: {
+                file: {
                     required: true,
                     extension: "xlsx"
                 }

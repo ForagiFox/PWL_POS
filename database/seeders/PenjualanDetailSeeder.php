@@ -10,9 +10,9 @@ class PenjualanDetailSeeder extends Seeder
     public function run(): void
     {
         $data = [];
-        $detail_id = 1;
+        $detail_id = 67;
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 22; $i++) {
             $used_barang = [];
             for ($j = 0; $j < 3; $j++) {
                 do {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BarangModel;
+use App\Models\PenjualanDetailModel;
 use App\Models\PenjualanModel;
 use App\Models\StokModel;
 use Illuminate\Http\Request;
@@ -19,19 +20,19 @@ class WelcomeController extends Controller
             'list' => ['Home', 'Dashboard']
         ];
 
-$stokData = StokModel::select(
-        DB::raw('DATE(stok_tanggal) as tanggal'),
-        DB::raw('SUM(stok_jumlah) as total_stok')
+$penjualanBulanan = PenjualanModel::select(
+        DB::raw('YEAR(penjualan_tanggal) as tahun'),
+        DB::raw('MONTH(penjualan_tanggal) as bulan'),
+        DB::raw('COUNT(*) as total')
     )
-    ->groupBy(DB::raw('DATE(stok_tanggal)'))
-    ->orderBy('tanggal')
+    ->groupBy(DB::raw('YEAR(penjualan_tanggal)'), DB::raw('MONTH(penjualan_tanggal)'))
+    ->orderBy(DB::raw('YEAR(penjualan_tanggal)'))
+    ->orderBy(DB::raw('MONTH(penjualan_tanggal)'))
     ->get();
 
-        $labels = $stokData->pluck('tanggal');
-        $values = $stokData->pluck('total_stok');
 
-        $barang = BarangModel::count();
+        $barang = PenjualanDetailModel::count('barang_id');
         $activeMenu = 'dashboard';
-        return view('welcome',['breadcrumb' => $breadcrumb,'barang' => $barang, 'activeMenu'=> $activeMenu,'labels' => $labels,'values' => $values, 'penjualan' => $penjualan, 'stok' => $stok]);
+        return view('welcome',['breadcrumb' => $breadcrumb,'barang' => $barang, 'activeMenu'=> $activeMenu,'penjualanBulanan' => $penjualanBulanan, 'penjualan' => $penjualan, 'stok' => $stok]);
     }
 }

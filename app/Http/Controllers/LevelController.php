@@ -26,7 +26,7 @@ class LevelController extends Controller
         return view('level.index',['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
     }
 
-    public function list(Request $request)
+    public function list()
     {
         $levels = LevelModel::select('level_id','level_kode','level_nama');
 
@@ -137,7 +137,7 @@ class LevelController extends Controller
             LevelModel::destroy($id);
             return redirect('/level')->with('success','Data level berhasil dihapus');
         }catch (\Illuminate\Database\QueryException $e){
-            return redirect('/level')->with('error','Data user gagal dihapus karena masih terdapat tabel lain terkait dengan data ini');
+            return redirect('/level')->with('error','Data user gagal dihapus karena masih terdapat tabel lain terkait dengan data ini'. $e);
         }
     }
          public function store_ajax(Request $reqeust)
@@ -239,7 +239,7 @@ class LevelController extends Controller
                 }catch(\Illuminate\Database\QueryException $e){
                     return response()->json([
                     'status' => false,
-                    'message' => 'Terjadi Kesalahan'
+                    'message' => 'Terjadi Kesalahan'. $e
                     ]);
                 }
             }else {
@@ -262,7 +262,7 @@ class LevelController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 // validasi file harus xls atau xlsx, max 1MB
-                "file_barang" => ["required", "mimes:xlsx", "max:1024"],
+                "file" => ["required", "mimes:xlsx", "max:1024"],
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -272,7 +272,7 @@ class LevelController extends Controller
                     "msgField" => $validator->errors(),
                 ]);
             }
-            $file = $request->file("file_supplier"); // ambil file dari request
+            $file = $request->file("file"); // ambil file dari request
             $reader = IOFactory::createReader("Xlsx"); // load reader file excel
             $reader->setReadDataOnly(true); // hanya membaca data
             try {

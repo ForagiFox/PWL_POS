@@ -1,4 +1,4 @@
-<form action="{{ url('/user/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
+<form action="{{ url('/kategori/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
     @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -10,15 +10,14 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
-                    <a href="{{ asset('template_barang.xlsx') }}" class="btn btn-info btn-sm" download>
+                    <a href="{{ asset('template_kategori.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download
                     </a>
-                    <small id="error-kategori_id" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Pilih File</label>
-                    <input type="file" name="file_user" id="file_user" class="form-control" required>
-                    <small id="error-file_barang" class="error-text form-text text-danger"></small>
+                    <input type="file" name="file" id="file" class="form-control" required>
+                    <small id="error-file" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -31,7 +30,7 @@
 
 <!-- Pindahkan script ini ke bawah, dekat tag </body>, agar DOM sudah siap -->
 <script>
-    $(function () {
+    $(function() {
         $("#form-import").validate({
             rules: {
                 file_user: {
@@ -39,7 +38,7 @@
                     extension: "xlsx"
                 }
             },
-            submitHandler: function (form) {
+            submitHandler: function(form) {
                 var formData = new FormData(form); // Buat FormData dari form
                 $.ajax({
                     url: form.action,
@@ -47,9 +46,10 @@
                     data: formData,
                     processData: false, // untuk menghandle file
                     contentType: false,
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status) {
-                            $('#modal-master').modal('hide'); // ini modalnya id-nya harus #modal-master
+                            $('#modal-master').modal(
+                                'hide'); // ini modalnya id-nya harus #modal-master
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
@@ -60,7 +60,7 @@
                             }
                         } else {
                             $('.error-text').text('');
-                            $.each(response.msgField, function (prefix, val) {
+                            $.each(response.msgField, function(prefix, val) {
                                 $('#error-' + prefix).text(val[0]);
                             });
                             Swal.fire({
@@ -70,7 +70,7 @@
                             });
                         }
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
@@ -81,17 +81,16 @@
                 return false;
             },
             errorElement: 'span',
-            errorPlacement: function (error, element) {
+            errorPlacement: function(error, element) {
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).addClass('is-invalid');
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).removeClass('is-invalid');
             }
         });
     });
 </script>
-

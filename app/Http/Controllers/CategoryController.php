@@ -256,7 +256,7 @@ class CategoryController extends Controller
 
     public function import()
     {
-        return view("level.import");
+        return view("category.import");
     }
 
     public function import_ajax(Request $request)
@@ -264,7 +264,7 @@ class CategoryController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 // validasi file harus xls atau xlsx, max 1MB
-                "file_barang" => ["required", "mimes:xlsx", "max:1024"],
+                "file" => ["required", "mimes:xlsx", "max:1024"],
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -274,7 +274,7 @@ class CategoryController extends Controller
                     "msgField" => $validator->errors(),
                 ]);
             }
-            $file = $request->file("file_supplier"); // ambil file dari request
+            $file = $request->file("file"); // ambil file dari request
             $reader = IOFactory::createReader("Xlsx"); // load reader file excel
             $reader->setReadDataOnly(true); // hanya membaca data
             try {

@@ -3,12 +3,12 @@
     'value' => 0,
     'id' => 'wave-' . uniqid(),
     'bg' => 'bg-primary',
-    'wavecolor' => 'rgba(255,255,255,0.2)'
+    'wavecolor' => 'rgba(255,255,255,0.2)',
 ])
 <div class="{{ $bg }} shadow rounded w-100 position-relative overflow-hidden">
     <svg class="position-absolute top-0 start-0 w-100 h-100" xmlns="http://www.w3.org/2000/svg">
         <defs></defs>
-        <path id="{{ $id }}" d=""/>
+        <path id="{{ $id }}" d="" />
     </svg>
 
     <div class="p-3 position-relative">
@@ -18,24 +18,21 @@
 </div>
 
 @push('css')
-
 @endpush
 
 
 @push('js')
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll("path[id^='wave-']").forEach(function (svg) {
-            $(svg).wavify({
-                height: 40,
-                bones: 5,
-                amplitude: 40,
-                color: '{{ $wavecolor }}', // bisa dibuat dinamis dari props juga
-                speed: 0.25
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll("path[id^='wave-']").forEach(function(svg) {
+                $(svg).wavify({
+                    height: 40,
+                    bones: 5,
+                    amplitude: 40,
+                    color: '{{ $wavecolor }}', // bisa dibuat dinamis dari props juga
+                    speed: 0.25
+                });
             });
         });
-    });
-</script>
+    </script>
 @endpush
-
-
