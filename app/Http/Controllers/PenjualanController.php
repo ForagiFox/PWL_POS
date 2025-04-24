@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BarangModel;
 use App\Models\PenjualanDetailModel;
 use App\Models\PenjualanModel;
+use App\Models\StokModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Yajra\DataTables\DataTables;
@@ -33,7 +37,7 @@ class PenjualanController extends Controller
     }
 
 
-    public function list(Request $request)
+    public function list()
     {
         $datas = PenjualanModel::select(
             "penjualan_id",
@@ -131,5 +135,93 @@ class PenjualanController extends Controller
         exit;
     }
 
+    public function create()
+    {
+    $barang = DB::table('m_barang')
+        ->join('t_stok', 'm_barang.barang_id', '=', 't_stok.barang_id')
+        ->select('m_barang.barang_id', 'm_barang.barang_nama', 'm_barang.harga_jual')
+        ->groupBy('m_barang.barang_id', 'm_barang.barang_nama', 'm_barang.harga_jual')
+            ->get();
+
+        return view('penjualan.create', [
+            'barang' => $barang
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        if ($request->ajax()) {
+            $rules = [
+                'pembeli'=>'required|string',
+                'penjualan_tanggal'=>'required|date',
+                'barang_id'=>'required|array|min:1',
+                'barang_id.*'=>'required|exists:m_barang,barang_id',
+                'jumlah'=>'required|array|min:1',
+                'jumlah.*'=>'required|integer|min:1'
+            ];
+            $v = Validator::make($request->all(), $rules);
+            if ($v->fails()) {
+                return response()->json(['status'=>false,'message'=>'Validasi gagal','msgField'=>$v->errors()]);
+            }
+
+            DB::beginTransaction();
+
+            $last = PenjualanModel::latest('penjualan_id')->first();
+            $next = $last? ((int)substr($last->penjualan_kode,3)+1) : 1;
+            $kode = 'P'.str_pad($next,3,'0',STR_PAD_LEFT);
+            $id = DB::table('t_penjualan')->insertGetId([
+                'user_id'           => auth()->id(),
+                'pembeli'           => $request->pembeli,
+                'penjualan_kode'    => $kode,
+                'penjualan_tanggal' => $request->penjualan_tanggal,
+                'created_at'        => now(),
+                'updated_at'        => now()
+            ]);
+            $barangId = $request->input('barang_id');
+            $jumlah = $request->input('jumlah');
+            $hargaJual = $request->input('harga_jual');
+            $detail = [];
+
+            $subStok = DB::table('t_stok')
+    ->select('barang_id', DB::raw('SUM(stok_jumlah) as total_stok'))
+    ->groupBy('barang_id');
+
+$subPenjualan = DB::table('t_penjualan_detail')
+    ->select('barang_id', DB::raw('SUM(jumlah) as total_terjual'))
+    ->groupBy('barang_id');
+            foreach ($barangId as $i => $bId) {
+                $stok = DB::table('m_barang')
+    ->leftJoinSub($subStok, 's', 'm_barang.barang_id', '=', 's.barang_id')
+    ->leftJoinSub($subPenjualan, 'p', 'm_barang.barang_id', '=', 'p.barang_id')
+    ->select(
+        'm_barang.barang_id',
+        'm_barang.barang_nama',
+        DB::raw('COALESCE(s.total_stok, 0) - COALESCE(p.total_terjual, 0) as total_stok')
+    )
+    ->where('s.barang_id',$bId)->first();
+                // dd($stok);
+                if($stok == null){
+                    DB::rollBack();
+                    return response()->json(['status'=> false,'message'=>'Stok Tidak Tersedia '.$bId]);
+                }elseif($stok->total_stok <= 0){
+                    DB::rollBack();
+                    return response()->json(['status'=> false,'message'=>'Stok '.$stok->barang_nama.' Sedang Habis']);
+                }else{
+                $detail[] = [
+                    'penjualan_id'=>$id,
+                    'barang_id'=>$bId,
+                    'harga'=>$hargaJual[$i] ?? 0,
+                    'jumlah'=>$jumlah[$i],
+                    'created_at'=>now(),
+                    'updated_at'=>now()
+                ];
+                }
+            }
+            PenjualanDetailModel::insert($detail);
+            DB::commit();
+            return response()->json(['status'=>true,'message'=>'Data berhasil disimpan']);
+        }
+        return redirect('/');
+    }
 
 }

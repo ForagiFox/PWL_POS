@@ -143,6 +143,8 @@ Route::middleware(['auth'])->group(function(){
         });
         Route::group(['prefix' => 'penjualan'], function (){
             Route::get('/',[PenjualanController::class, 'index']);
+            Route::get('/create',[PenjualanController::class, 'create']);
+            Route::post('/store',[PenjualanController::class, 'store']);
             Route::post('/list',[PenjualanController::class, 'list']);
             Route::get('/{id}/detail',[PenjualanController::class, 'detail']);
             Route::get('/excel',[PenjualanController::class, 'export_excel']);

@@ -34,7 +34,7 @@ class StokController extends Controller
     }
 
 
-    public function list(Request $request)
+    public function list()
     {
         $datas = StokModel::select(
             "stok_id",
@@ -98,7 +98,7 @@ class StokController extends Controller
                 }catch(\Illuminate\Database\QueryException $e){
                     return response()->json([
                     'status' => false,
-                    'message' => 'Terjadi Kesalahan'
+                    'message' => 'Terjadi Kesalahan'.$e
                     ]);
                 }
             }else {
