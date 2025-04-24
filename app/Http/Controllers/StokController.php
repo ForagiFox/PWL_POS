@@ -8,6 +8,8 @@ use App\Models\SupplierModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class StokController extends Controller
 {
@@ -147,4 +149,65 @@ class StokController extends Controller
             ]);
         }
     }
+        public function export_excel()
+    {
+        // Ambil data user dengan relasi level
+        $users = StokModel::with(['supplier','user','barang'])->get();
+
+        // Buat objek Spreadsheet baru
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'Nama Barang');
+        $sheet->setCellValue('B1', 'Nama Supplier');
+        $sheet->setCellValue('C1', 'Nama User');
+        $sheet->setCellValue('D1', 'Tanggal Stok');
+        $sheet->setCellValue('E1', 'Jumlah Stok');
+
+        // Buat header bold
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        // Isi data user
+        $no = 1;
+        $row = 2;
+        foreach ($users as $user) {
+            $sheet->setCellValue('A' . $row, $user->barang->barang_nama);
+            // Jika relasi level tidak ada, tampilkan kosong
+            $sheet->setCellValue('B' . $row, $user->supplier->supplier_nama);
+            $sheet->setCellValue('C' . $row, $user->user->nama);
+            $sheet->setCellValue('D' . $row, $user->stok_tanggal);
+            $sheet->setCellValue('E' . $row, $user->stok_jumlah);
+            $row++;
+            $no++;
+        }
+
+        // Set auto-size untuk kolom A sampai D
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Set judul sheet
+        $sheet->setTitle('Data Stok');
+
+        // Buat writer untuk file Excel
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Stok ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        // Set header HTTP untuk file download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        // Output file Excel ke browser
+        $writer->save('php://output');
+        exit;
+    }
+
+
 }

@@ -8,6 +8,7 @@ use App\Models\PenjualanModel;
 use App\Models\StokModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
 
 class WelcomeController extends Controller
 {
@@ -30,9 +31,44 @@ $penjualanBulanan = PenjualanModel::select(
     ->orderBy(DB::raw('MONTH(penjualan_tanggal)'))
     ->get();
 
-
-        $barang = PenjualanDetailModel::count('barang_id');
+        $barang = BarangModel::count('barang_id');
+        $penjualan = PenjualanDetailModel::count('barang_id');
         $activeMenu = 'dashboard';
-        return view('welcome',['breadcrumb' => $breadcrumb,'barang' => $barang, 'activeMenu'=> $activeMenu,'penjualanBulanan' => $penjualanBulanan, 'penjualan' => $penjualan, 'stok' => $stok]);
+        return view('welcome',['breadcrumb' => $breadcrumb,'penjualan' => $penjualan, 'activeMenu'=> $activeMenu,'penjualanBulanan' => $penjualanBulanan, 'penjualan' => $penjualan, 'stok' => $stok, 'barang' => $barang]);
+    }
+    public function list(Request $request)
+    {
+        // $stokTerbaru = StokModel::with(['barang', 'supplier'])
+        //     ->selectRaw('barang_id, supplier_id, SUM(stok_jumlah) as total_stok')
+        //     ->groupBy('barang_id')
+        //     ->get();
+        //
+
+$subStok = DB::table('t_stok')
+    ->select('barang_id', DB::raw('SUM(stok_jumlah) as total_stok'))
+    ->groupBy('barang_id');
+
+$subPenjualan = DB::table('t_penjualan_detail')
+    ->select('barang_id', DB::raw('SUM(jumlah) as total_terjual'))
+    ->groupBy('barang_id');
+
+$stokTerbaru = DB::table('m_barang')
+    ->leftJoinSub($subStok, 's', 'm_barang.barang_id', '=', 's.barang_id')
+    ->leftJoinSub($subPenjualan, 'p', 'm_barang.barang_id', '=', 'p.barang_id')
+    ->select(
+        'm_barang.barang_id',
+        'm_barang.barang_nama',
+        DB::raw('COALESCE(s.total_stok, 0) - COALESCE(p.total_terjual, 0) as total_stok')
+    )
+    ->get();
+
+
+
+        return DataTables::of($stokTerbaru)
+            ->addIndexColumn()
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
 }
+
+

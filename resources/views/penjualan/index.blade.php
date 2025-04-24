@@ -5,10 +5,11 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <button disabled onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-sm mt-1 btn-info">Import Supplier</button>
-                <a href="{{ url('/supplier/export_excel') }}" class="btn btn-sm mt-1 btn-primary"><i class="fa fa-file-excel"></i> Export Supplier</a>
-                <a href="{{ url('/supplier/export_pdf') }}" class="btn btn-sm mt-1 btn-warning"><i class="fa fa-file-pdf"></i> Export Supplier</a>
-                <button disabled onclick="modalAction('{{ url('supplier/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                {{-- <button disabled onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-sm mt-1 btn-info">Import Supplier</button> --}}
+                <a href="{{ url('/penjualan/excel') }}" class="btn btn-sm mt-1 btn-primary"><i
+                        class="fa fa-file-excel"></i> Export</a>
+                {{-- <a href="{{ url('/supplier/export_pdf') }}" class="btn btn-sm mt-1 btn-warning"><i class="fa fa-file-pdf"></i> Export Supplier</a> --}}
+                {{-- <button disabled onclick="modalAction('{{ url('supplier/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button> --}}
             </div>
         </div>
         <div class="card-body">
@@ -33,7 +34,8 @@
             </table>
         </div>
     </div>
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')

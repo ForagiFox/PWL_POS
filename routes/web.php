@@ -32,6 +32,7 @@ Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/', [WelcomeController::class,'index']);
+    Route::post('/list', [WelcomeController::class,'list']);
     Route::middleware(['authorize:ADM,MNG'])->group(function(){
 
         Route::group(['prefix' => 'barang'], function (){
@@ -144,10 +145,12 @@ Route::middleware(['auth'])->group(function(){
             Route::get('/',[PenjualanController::class, 'index']);
             Route::post('/list',[PenjualanController::class, 'list']);
             Route::get('/{id}/detail',[PenjualanController::class, 'detail']);
+            Route::get('/excel',[PenjualanController::class, 'export_excel']);
         });
         Route::group(['prefix' => 'stok'], function (){
             Route::get('/',[StokController::class, 'index']);
             Route::post('/list',[StokController::class, 'list']);
+            Route::get('/excel',[StokController::class, 'export_excel']);
             Route::get('/{id}/detail',[StokController::class, 'detail']);
             Route::get('/{id}/confirm',[StokController::class, 'confirm']);
             Route::delete('/{id}/delete',[StokController::class, 'delete']);

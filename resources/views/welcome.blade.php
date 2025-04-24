@@ -10,12 +10,12 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row g-4">
+                <div class="row g-4 mb-5">
                     <div class="col-12 col-md-4">
                         <x-count title="Total Transaksi" :value="$penjualan" />
                     </div>
                     <div class="col-12 col-md-4">
-                        <x-count title="Total Stok Ready" :value="$stok" bg="bg-success" />
+                        <x-count title="Total Stok Ready" :value="$stok . ' / ' . $barang.' Barang'" bg="bg-success" />
                     </div>
                     <div class="col-12 col-md-4">
                         <x-count title="Total Stok Terjual" :value="$barang" bg="bg-info" />
@@ -28,6 +28,17 @@
 
                     </div>
                 </div>
+                <h3>Table Total Stok Ready</h3>
+                <table class="table table-bordered table-striped table-hover table-sm" id="table_penjualan">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Jumlah Stok</th>
+                        </tr>
+                    </thead>
+                </table>
+
+
 
             </div>
         </div>
@@ -48,10 +59,49 @@
 @endphp
 @push('js')
     <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+
+        var data;
+
+
+        $(document).ready(function() {
+            data = $('#table_penjualan').DataTable({
+                serverSide: true,
+                ajax: {
+                    url: "{{ url('/list') }}",
+                    dataType: "json",
+                    type: "POST",
+
+                },
+                pageLength: 5,
+                columns: [{
+                        data: "barang_nama",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "total_stok",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },
+
+                ]
+            });
+
+        });
+    </script>
+
+    <script>
         var options = {
             chart: {
                 type: 'bar',
-                height: 400
+                height: 300
             },
             series: [{
                 name: 'Penjualan',
