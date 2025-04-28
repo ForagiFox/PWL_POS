@@ -15,10 +15,10 @@
                         <x-count title="Total Transaksi" :value="$penjualan" />
                     </div>
                     <div class="col-12 col-md-4">
-                        <x-count title="Total Stok Ready" :value="$stok . ' / ' . $barang.' Barang'" bg="bg-success" />
+                        <x-count title="Total Stok Ready" :value="$stok . ' / ' . $barang . ' Barang'" bg="bg-success" />
                     </div>
                     <div class="col-12 col-md-4">
-                        <x-count title="Total Stok Terjual" :value="$barang" bg="bg-info" />
+                        <x-count title="Total Stok Terjual" :value="$terjual" bg="bg-info" />
                     </div>
                 </div>
 
