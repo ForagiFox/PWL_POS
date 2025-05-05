@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class LevelController extends Controller
 {
+    public function index()
+    {
+        return LevelModel::all();
+    }
+
     public function store(Request $request)
     {
         $level = LevelModel::create($request->all());
